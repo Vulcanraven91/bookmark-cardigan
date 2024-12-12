@@ -27,6 +27,11 @@ const Index = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
   }, [bookmarks]);
 
+  const handleClearAll = () => {
+    setBookmarks([]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   const handleAdd = (newBookmark: Omit<Bookmark, "id">) => {
     if (bookmarks.some(b => b.url === newBookmark.url)) {
       toast.error("This bookmark already exists!");
@@ -148,6 +153,7 @@ ${items}
         onDragEnd={handleDragEnd}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onClearAll={handleClearAll}
       />
     </div>
   );
