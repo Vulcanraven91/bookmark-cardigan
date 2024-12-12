@@ -4,4 +4,5 @@ export interface Bookmark {
   title: string;
   description?: string;
   favicon?: string;
+  isFolder?: boolean;
 }

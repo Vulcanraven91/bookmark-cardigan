@@ -5,6 +5,7 @@ import { Bookmark } from "@/types/bookmark";
 import { nanoid } from "nanoid";
 import { parseBookmarksFile } from "@/utils/bookmarkParser";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const STORAGE_KEY = "bookmarks";
 
@@ -27,7 +28,6 @@ const Index = () => {
   }, [bookmarks]);
 
   const handleAdd = (newBookmark: Omit<Bookmark, "id">) => {
-    // Check for duplicates
     if (bookmarks.some(b => b.url === newBookmark.url)) {
       toast.error("This bookmark already exists!");
       return;
@@ -36,7 +36,7 @@ const Index = () => {
     const bookmark: Bookmark = {
       ...newBookmark,
       id: nanoid(),
-      favicon: `https://www.google.com/s2/favicons?domain=${new URL(newBookmark.url).hostname}`,
+      favicon: newBookmark.isFolder ? undefined : `https://www.google.com/s2/favicons?domain=${new URL(newBookmark.url).hostname}`,
     };
     setBookmarks([...bookmarks, bookmark]);
     toast.success("Bookmark added successfully!");
@@ -60,6 +60,37 @@ const Index = () => {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setBookmarks(items);
+  };
+
+  const handleExport = () => {
+    const generateHTML = (bookmarks: Bookmark[]) => {
+      const items = bookmarks.map(bookmark => {
+        if (bookmark.isFolder) {
+          return `<DT><H3>${bookmark.title}</H3>`;
+        }
+        return `<DT><A HREF="${bookmark.url}" ${bookmark.description ? `DESCRIPTION="${bookmark.description}"` : ''}>${bookmark.title}</A>`;
+      }).join('\n');
+
+      return `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+${items}
+</DL><p>`;
+    };
+
+    const html = generateHTML(bookmarks);
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bookmarks.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Bookmarks exported successfully!");
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +137,9 @@ const Index = () => {
               className="hidden"
             />
           </label>
+          <Button onClick={handleExport} variant="outline">
+            Export Bookmarks
+          </Button>
           <AddBookmarkDialog onAdd={handleAdd} />
         </div>
       </div>
