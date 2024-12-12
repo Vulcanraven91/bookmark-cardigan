@@ -41,6 +41,7 @@ const Index = () => {
     const bookmark: Bookmark = {
       ...newBookmark,
       id: nanoid(),
+      dateAdded: Date.now(),
       favicon: newBookmark.isFolder ? undefined : `https://www.google.com/s2/favicons?domain=${new URL(newBookmark.url).hostname}`,
     };
     setBookmarks([...bookmarks, bookmark]);

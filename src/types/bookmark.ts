@@ -5,4 +5,5 @@ export interface Bookmark {
   description?: string;
   favicon?: string;
   isFolder?: boolean;
+  dateAdded?: number;
 }
