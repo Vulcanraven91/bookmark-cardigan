@@ -1,9 +1,12 @@
 export interface Bookmark {
   id: string;
-  url: string;
   title: string;
+  url?: string;
   description?: string;
   favicon?: string;
-  isFolder?: boolean;
   dateAdded?: number;
+  isFolder: boolean;
+  isHidden?: boolean;
 }
+
+export type ViewStyle = "grid" | "list";
